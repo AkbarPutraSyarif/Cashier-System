@@ -1,78 +1,102 @@
 <!DOCTYPE html>
 <html lang="en" x-data="cartApp()" x-init="init()">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cashier</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Boxicons -->
-    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="css/style.css">
-    <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="SB-Mid-client-WnrWCWnRg16nbT1-"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cashier</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Boxicons -->
+  <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="SB-Mid-client-N0Nur1feGjqSQ6xl"></script>
 </head>
+
 <body>
 
-<!-- Header -->
-<header class="bg-white shadow-sm py-3 fixed-top w-100 z-3">
-  <div class="container d-flex justify-content-between align-items-center">
-    <a href="#" class="d-flex align-items-center">
-      <img src="img/logo.png" alt="Logo" style="height: 80px;">
-    </a>
+  <!-- Header -->
+  <header class="bg-dark shadow-sm py-3 fixed-top w-100 z-3">
+    <div class="container d-flex justify-content-between align-items-center">
+      <a href="#" class="d-flex align-items-center text-white text-decoration-none">
+        <img src="img/logo.png" alt="Logo" style="height: 80px;">
+        <span class="ms-2 fs-4 fw-semibold">PreloveBag</span>
+      </a>
 
-    <!-- Tombol dashboard -->
-    <div class="d-flex align-items-center gap-3">
-      <a href="dashboard.php" class="btn btn-outline-dark btn-sm">Dashboard</a>
-      <i class='bx bx-cart-alt fs-3 cursor-pointer' @click="open = true" role="button"></i>
+      <!-- Tombol dashboard -->
+      <div class="d-flex align-items-center gap-3">
+        <a href="dashboard.html" class="btn btn-outline-light btn-sm">Dashboard</a>
+
+        <input type="text" class="form-control form-control-sm" placeholder="Cari produk..." x-model="keyword"
+          @input="filterProducts" style="width: 200px;">
+
+        <i class='bx bx-cart-alt fs-3 text-white cursor-pointer' @click="open = true" role="button"></i>
+      </div>
+
+  </header>
+
+
+  <!-- Cart Sidebar -->
+  <div class="cart-sidebar bg-white shadow" x-show="open" x-transition>
+    <div class="d-flex justify-content-between align-items-center px-3 mt-3">
+      <h2 class="mb-0">Cart</h2>
+      <button class="btn-close" aria-label="Close" @click="open = false"></button>
+    </div>
+
+    <div class="cart-content px-3" style="max-height: 50vh; overflow-y: auto;">
+      <template x-for="(item, index) in cart" :key="item.title">
+        <div class="d-flex align-items-center border-bottom py-2">
+          <img :src="item.img" class="cart-img me-2" width="70">
+          <div class="flex-grow-1">
+            <h6 class="mb-1" x-text="item.title"></h6>
+            <span class="text-danger fw-semibold" x-text="formatRupiah(item.price)"></span>
+            <input type="number" class="form-control form-control-sm mt-1 w-50" min="1" x-model.number="item.quantity"
+              @change="updateTotal()">
+          </div>
+          <i class='bx bx-trash-alt text-danger ms-2 fs-5' role="button" @click="removeItem(index)"></i>
+        </div>
+      </template>
+    </div>
+
+    <div class="d-flex justify-content-between border-top px-3 py-2 fw-bold">
+      <span>Total</span>
+      <span x-text="formatRupiah(total)"></span>
+    </div>
+    <div class="px-3 mb-3">
+      <button type="button" class="btn btn-danger w-100" @click="bayar()">Bayar</button>
+
     </div>
   </div>
-</header>
 
-
-<!-- Cart Sidebar -->
-<div class="cart-sidebar bg-white shadow" x-show="open" x-transition>
-  <div class="d-flex justify-content-between align-items-center px-3 mt-3">
-    <h2 class="mb-0">Cart</h2>
-    <button class="btn-close" aria-label="Close" @click="open = false"></button>
-  </div>
-
-  <div class="cart-content px-3" style="max-height: 50vh; overflow-y: auto;">
-    <template x-for="(item, index) in cart" :key="item.title">
-      <div class="d-flex align-items-center border-bottom py-2">
-        <img :src="item.img" class="cart-img me-2" width="70">
-        <div class="flex-grow-1">
-          <h6 class="mb-1" x-text="item.title"></h6>
-          <span class="text-danger fw-semibold" x-text="formatRupiah(item.price)"></span>
-          <input type="number" class="form-control form-control-sm mt-1 w-50" min="1" x-model.number="item.quantity" @change="updateTotal()">
-        </div>
-        <i class='bx bx-trash-alt text-danger ms-2 fs-5' role="button" @click="removeItem(index)"></i>
-      </div>
-    </template>
-  </div>
-
-  <div class="d-flex justify-content-between border-top px-3 py-2 fw-bold">
-    <span>Total</span>
-    <span x-text="formatRupiah(total)"></span>
-  </div>
-  <div class="px-3 mb-3">
-    <button class="btn btn-danger w-100" @click="bayar()">Bayar</button>
-  </div>
-</div>
-
-<!-- Products Section -->
+  <!-- Products Section -->
 <section class="container mt-5 pt-5">
-  <h2 class="text-center mb-4">Barang-Barang</h2>
   <div class="row g-4">
-    <template x-for="product in products" :key="product.id">
-      <div class="col-md-3">
-        <div class="card h-100">
-          <img :src="product.img" class="card-img-top" alt="">
-          <div class="card-body">
-            <h5 class="card-title" x-text="product.title"></h5>
-            <p class="card-text text-danger fw-bold" x-text="formatRupiah(product.price)"></p>
-            <p class="text-muted">Stok: <span x-text="product.quantity"></span> pcs</p>
-            <button class="btn btn-dark w-100" @click.stop="addToCart(product)">Add to Cart</button>
+    <template x-for="product in filteredProducts" :key="product.id">
+      <div class="col-sm-6 col-md-4 col-lg-3">
+        <div class="card h-100 shadow-sm border-0 position-relative product-card hover-shadow transition">
+          <img :src="product.img" class="card-img-top" alt="Gambar Produk" style="object-fit: cover;">
+
+          <div class="card-body d-flex flex-column justify-content-between">
+            <h5 class="card-title mb-2" x-text="product.title"></h5>
+
+            <p class="card-text text-danger fw-bold fs-5" x-text="formatRupiah(product.price)"></p>
+
+            <div class="mb-3">
+              <template x-if="product.quantity > 0">
+                <span class="badge bg-success">Stok: <span x-text="product.quantity"></span> pcs</span>
+              </template>
+              <template x-if="product.quantity == 0">
+                <span class="badge bg-danger">Sold Out</span>
+              </template>
+            </div>
+
+            <button class="btn w-100 transition" 
+              :class="product.quantity == 0 ? 'btn-secondary disabled' : 'btn-dark'" 
+              :disabled="product.quantity == 0" 
+              @click.stop="addToCart(product)">
+              <span x-text="product.quantity == 0 ? 'Sold Out' : 'Add to Cart'"></span>
+            </button>
           </div>
         </div>
       </div>
@@ -80,12 +104,14 @@
   </div>
 </section>
 
-<!-- Alpine.js -->
-<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
-<!-- SweetAlert -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<!-- Custom JS -->
-<script src="js/main.js"></script>
+
+  <!-- Alpine.js -->
+  <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+  <!-- SweetAlert -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <!-- Custom JS -->
+  <script src="js/main.js"></script>
 
 </body>
+
 </html>

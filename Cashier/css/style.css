@@ -3,6 +3,16 @@ body {
     padding-top: 80px;
 }
 
+header {
+    background-color: gray;
+}
+
+.card-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    min-height: 3rem;
+}
+
 .cart-sidebar {
     position: fixed;
     top: 0;
@@ -21,3 +31,23 @@ body {
     border-radius: 8px;
 }
 
+
+.product-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.product-card:hover {
+    transform: translateY(-15px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.btn-dark {
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.btn-dark:hover {
+    background-color: #222;
+    transform: scale(1.02);
+}

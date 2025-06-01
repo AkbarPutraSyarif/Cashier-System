@@ -3,7 +3,7 @@
 require_once dirname(__FILE__) . '/midtrans-php-master/Midtrans.php';
 
 // Konfigurasi Midtrans
-\Midtrans\Config::$serverKey = 'SB-Mid-server-34W_Tg1pRmK6iuLwM4Q8s3Fs';
+\Midtrans\Config::$serverKey = 'SB-Mid-server-LlwYAFGn4xMnox37jtlAxDPY';
 \Midtrans\Config::$isProduction = false;
 \Midtrans\Config::$isSanitized = true;
 \Midtrans\Config::$is3ds = true;
