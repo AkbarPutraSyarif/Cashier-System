@@ -5,6 +5,7 @@ function cartApp() {
         total: 0,
         products: [],
         keyword: '',
+        filteredProducts: [], 
 
         init() {
             this.loadProducts();
@@ -17,6 +18,7 @@ function cartApp() {
                 .then(res => res.json())
                 .then(data => {
                     this.products = data;
+                    this.filteredProducts = data;
                 })
                 .catch(err => {
                     console.error("Gagal memuat produk:", err);
@@ -28,6 +30,14 @@ function cartApp() {
             if (savedCart) {
                 this.cart = JSON.parse(savedCart);
             }
+        },
+
+        // Search Product
+        filterProducts() {
+            const keywordLower = this.keyword.toLowerCase();
+            this.filteredProducts = this.products.filter(product =>
+                product.title.toLowerCase().startsWith(keywordLower)
+            );
         },
 
         saveCart() {
@@ -153,52 +163,54 @@ function cartApp() {
                     total: this.total
                 })
             })
-            .then(res => res.json())
-            .then(data => {
-                if (data.token) {
-                    window.snap.pay(data.token, {
-                        onSuccess: () => {
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Pembayaran Berhasil!',
-                                text: 'Terima kasih atas pembeliannya.'
-                            });
-                            this.cart = [];
-                            this.saveCart();
-                            this.updateTotal();
-                        },
-                        onPending: () => {
-                            Swal.fire({
-                                icon: 'info',
-                                title: 'Menunggu Pembayaran',
-                                text: 'Silakan selesaikan pembayaran Anda.'
-                            });
-                        },
-                        onError: () => {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Pembayaran Gagal',
-                                text: 'Terjadi kesalahan saat pembayaran.'
-                            });
-                        }
-                    });
-                } else {
+                .then(res => res.json())
+                .then(data => {
+                    if (data.token) {
+                        window.snap.pay(data.token, {
+                            onSuccess: () => {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Pembayaran Berhasil!',
+                                    text: 'Terima kasih atas pembeliannya.'
+                                }).then(() => {
+                                    this.cart = [];
+                                    this.saveCart();
+                                    this.updateTotal();
+                                    window.location.reload();
+                                });
+                            },
+                            onPending: () => {
+                                Swal.fire({
+                                    icon: 'info',
+                                    title: 'Menunggu Pembayaran',
+                                    text: 'Silakan selesaikan pembayaran Anda.'
+                                });
+                            },
+                            onError: () => {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Pembayaran Gagal',
+                                    text: 'Terjadi kesalahan saat pembayaran.'
+                                });
+                            }
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Transaksi Gagal',
+                            text: 'Token pembayaran tidak tersedia.'
+                        });
+                        console.error(data);
+                    }
+                })
+                .catch(err => {
+                    console.error("Payment error:", err);
                     Swal.fire({
                         icon: 'error',
-                        title: 'Transaksi Gagal',
-                        text: 'Token pembayaran tidak tersedia.'
+                        title: 'Kesalahan Sistem',
+                        text: 'Gagal memproses pembayaran.'
                     });
-                    console.error(data);
-                }
-            })
-            .catch(err => {
-                console.error("Payment error:", err);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Kesalahan Sistem',
-                    text: 'Gagal memproses pembayaran.'
                 });
-            });
         }
 
     }

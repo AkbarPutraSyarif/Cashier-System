@@ -19,18 +19,24 @@ switch ($action) {
         $quantity = $_POST['quantity'];
         $img = '';
 
-        if (isset($_FILES['img'])) {
+        if (isset($_FILES['img']) && $_FILES['img']['error'] === 0) {
             $fileName = time() . '_' . basename($_FILES['img']['name']);
             $target = '../uploads/' . $fileName;
-            move_uploaded_file($_FILES['img']['tmp_name'], $target);
-            $img = 'uploads/' . $fileName;
+            if (move_uploaded_file($_FILES['img']['tmp_name'], $target)) {
+                $img = 'uploads/' . $fileName;
+            }
         }
 
         $stmt = $conn->prepare("INSERT INTO products (title, price, quantity, img) VALUES (?, ?, ?, ?)");
         $stmt->bind_param("siis", $title, $price, $quantity, $img);
-        $stmt->execute();
-        echo json_encode(["status" => "success"]);
+
+        if ($stmt->execute()) {
+            echo json_encode(["status" => "success"]);
+        } else {
+            echo json_encode(["status" => "error", "message" => $stmt->error]);
+        }
         break;
+
 
     case 'delete':
         $id = $_POST['id'];
@@ -60,4 +66,3 @@ switch ($action) {
         echo json_encode(["status" => "updated"]);
         break;
 }
-?>
